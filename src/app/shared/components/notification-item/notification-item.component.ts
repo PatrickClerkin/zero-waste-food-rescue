@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { Notification } from '../../../core/models/notification.model';
-import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
+import { TimeAgoPipe } from 'src/app/shared/pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-notification-item',

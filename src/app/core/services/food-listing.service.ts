@@ -25,7 +25,7 @@ import {
 } from '@angular/fire/storage';
 import { Observable, from, map, switchMap, firstValueFrom } from 'rxjs'; // Added firstValueFrom
 import { FoodListing, FoodCategory } from '../models/food-listing.model';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.model';
 
 @Injectable({

@@ -1,35 +1,33 @@
 // src/app/core/services/auth.service.ts
-// Moving this from src/app/app/core/services/auth.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { 
-  Auth, 
+  getAuth, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut, 
   sendPasswordResetEmail, 
   updateProfile, 
   UserCredential, 
-  user, 
   onAuthStateChanged 
-} from '@angular/fire/auth';
+} from 'firebase/auth';
 import { 
-  Firestore, 
+  getFirestore, 
   doc, 
   setDoc, 
   getDoc, 
   updateDoc 
-} from '@angular/fire/firestore';
-import { BehaviorSubject, Observable, from, of, switchMap } from 'rxjs';
+} from 'firebase/firestore';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { app } from '../../firebase';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private auth: Auth = inject(Auth);
-  private firestore: Firestore = inject(Firestore);
+  private auth = getAuth(app);
+  private firestore = getFirestore(app);
   private router = inject(Router);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);

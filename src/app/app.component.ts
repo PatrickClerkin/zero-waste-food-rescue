@@ -1,16 +1,17 @@
 // src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { filter } from 'rxjs/operators';
-import { AuthService } from './core/services/auth.service'; // Fixed import path
+import { AuthService } from './core/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
+import { getAuth } from 'firebase/auth';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, IonicModule],
+  imports: [CommonModule, RouterOutlet, IonicModule, RouterLink],
   template: `
     <ion-app>
       <ion-router-outlet></ion-router-outlet>
@@ -66,6 +67,14 @@ export class AppComponent implements OnInit {
   ) {}
   
   ngOnInit(): void {
+    // Debug Firebase initialization
+    try {
+      const auth = getAuth();
+      console.log('Firebase Auth initialized:', auth);
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
     // Hide tabs on auth pages
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -75,16 +84,26 @@ export class AppComponent implements OnInit {
     });
     
     // Get unread notification count
-    this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        this.subscribeToNotifications();
+    this.authService.currentUser$.subscribe({
+      next: user => {
+        if (user) {
+          this.subscribeToNotifications();
+        }
+      },
+      error: err => {
+        console.error('Error in currentUser$ subscription:', err);
       }
     });
   }
   
   private subscribeToNotifications(): void {
-    this.notificationService.getUserNotifications().subscribe(notifications => {
-      this.unreadNotificationCount = notifications.filter(n => !n.isRead).length;
+    this.notificationService.getUserNotifications().subscribe({
+      next: notifications => {
+        this.unreadNotificationCount = notifications.filter(n => !n.isRead).length;
+      },
+      error: err => {
+        console.error('Error getting notifications:', err);
+      }
     });
   }
 }

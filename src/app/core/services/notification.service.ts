@@ -14,9 +14,10 @@ import {
   addDoc,
   getDocs as firestoreGetDocs
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
+import { map, take, switchMap } from 'rxjs/operators';
 import { Notification } from '../models/notification.model';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -47,18 +48,22 @@ export class NotificationService {
 
   // Get notifications for current user
   getUserNotifications(): Observable<Notification[]> {
-    const currentUser = this.authService.currentUser$.getValue();
-    if (!currentUser) {
-      throw new Error('User not authenticated');
-    }
-    
-    const notificationsQuery = query(
-      collection(this.firestore, 'notifications'),
-      where('recipientId', '==', currentUser.uid),
-      orderBy('createdAt', 'desc')
+    return this.authService.currentUser$.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+        
+        const notificationsQuery = query(
+          collection(this.firestore, 'notifications'),
+          where('recipientId', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        );
+        
+        return collectionData(notificationsQuery) as Observable<Notification[]>;
+      })
     );
-    
-    return collectionData(notificationsQuery) as Observable<Notification[]>;
   }
 
   // Mark notification as read
@@ -103,7 +108,7 @@ export class NotificationService {
       
       // Create notification for this user
       await this.createNotification({
-        recipientId: user.uid,
+        recipientId: user['uid'],
         title: 'New Food Available',
         message: `New ${category} listing: ${title}`,
         type: 'new-listing',

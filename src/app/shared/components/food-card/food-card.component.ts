@@ -4,9 +4,8 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { FoodListing } from '../../../core/models/food-listing.model';
-import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
-import { DistancePipe } from '../../pipes/distance.pipe';
-
+import { TimeAgoPipe } from 'src/app/shared/pipes/time-ago.pipe';
+import { DistancePipe } from 'src/app/shared/pipes/distance.pipe';
 @Component({
   selector: 'app-food-card',
   standalone: true,

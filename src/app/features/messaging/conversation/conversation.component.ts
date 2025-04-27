@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { Message } from '../../../core/models/message.model';
 import { User } from '../../../core/models/user.model';
 import { MessagingService } from '../../../core/services/messaging.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { TimeAgoPipe } from '../../../shared/pipes/time-ago.pipe';
 
 @Component({
@@ -76,7 +76,7 @@ import { TimeAgoPipe } from '../../../shared/pipes/time-ago.pipe';
             autoGrow="true"
             rows="1"
             class="message-input"
-            (keydown.enter)="onEnterPress($event)"
+            (keydown.enter)="handleEnterPress($event)"
           ></ion-textarea>
           
           <ion-button 
@@ -298,6 +298,11 @@ export class ConversationComponent implements OnInit, OnDestroy {
   
   isSentMessage(message: Message): boolean {
     return this.currentUser?.uid === message.senderId;
+  }
+  
+  // Add this method to handle the event
+  handleEnterPress(event: any): void {
+    this.onEnterPress(event as KeyboardEvent);
   }
   
   onEnterPress(event: KeyboardEvent): void {

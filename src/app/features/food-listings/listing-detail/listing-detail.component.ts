@@ -5,16 +5,20 @@ import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FoodListing } from '../../../core/models/food-listing.model';
 import { FoodListingService } from '../../../core/services/food-listing.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { MessagingService } from '../../../core/services/messaging.service';
 import { LocationService } from '../../../core/services/location.service';
 import { MapViewComponent } from '../../../shared/components/map-view/map-view.component';
 import { TimeAgoPipe } from '../../../shared/pipes/time-ago.pipe';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-listing-detail',
   standalone: true,
+  
   imports: [CommonModule, IonicModule, RouterLink, MapViewComponent, TimeAgoPipe],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <ion-header>
       <ion-toolbar>
@@ -376,7 +380,6 @@ export class ListingDetailComponent implements OnInit {
       this.loadListing();
     });
   }
-  
   async loadListing(): Promise<void> {
     this.isLoading = true;
     
@@ -390,8 +393,8 @@ export class ListingDetailComponent implements OnInit {
       
       this.listing = listing;
       
-      // Check if current user is the owner
-      const currentUser = this.authService.currentUser$.getValue();
+      // Check if current user is the owner - using firstValueFrom instead of getValue()
+      const currentUser = await firstValueFrom(this.authService.currentUser$);
       this.isOwner = currentUser?.uid === listing.donorId;
       this.isClaimer = currentUser?.uid === listing.claimedBy;
       
@@ -402,7 +405,6 @@ export class ListingDetailComponent implements OnInit {
       this.router.navigate(['/food-listings']);
     }
   }
-  
   get canClaim(): boolean {
     if (!this.listing || !this.isAuthenticated) return false;
     

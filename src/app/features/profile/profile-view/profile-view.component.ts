@@ -1,19 +1,20 @@
 // src/app/features/profile/profile-view/profile-view.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterLink, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { User } from '../../../core/models/user.model';
 import { FoodListing } from '../../../core/models/food-listing.model';
-import { AuthService } from '../../../core/services/auth.service';
-import { FoodListingService } from '../../../core/services/food-listing.service';
-import { FoodCardComponent } from '../../../shared/components/food-card/food-card.component';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { FoodListingService } from 'src/app/core/services/food-listing.service';
+import { FoodCardComponent } from 'src/app/shared/components/food-card/food-card.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-view',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterLink, FoodCardComponent],
+  imports: [CommonModule, IonicModule, RouterLink, FoodCardComponent, FormsModule],
   template: `
     <ion-header>
       <ion-toolbar color="primary">
@@ -98,7 +99,7 @@ import { FoodCardComponent } from '../../../shared/components/food-card/food-car
             </ion-card-content>
           </ion-card>
           
-          <ion-card class="info-card" *ngIf="user?.ratingCount && user?.ratingCount > 0">
+          <ion-card class="info-card" *ngIf="hasRatings()">
             <ion-card-header>
               <ion-card-title>Ratings</ion-card-title>
             </ion-card-header>
@@ -264,7 +265,7 @@ import { FoodCardComponent } from '../../../shared/components/food-card/food-car
     }
   `]
 })
-export class ProfileViewComponent implements OnInit {
+export class ProfileViewComponent implements OnInit, OnDestroy {
   user: User | null = null;
   selectedSegment = 'info';
   myListings: FoodListing[] = [];
@@ -319,8 +320,13 @@ export class ProfileViewComponent implements OnInit {
     }
   }
   
+  // Helper method to check if user has ratings
+  hasRatings(): boolean {
+    return !!(this.user && this.user.ratingCount && this.user.ratingCount > 0);
+  }
+  
   get averageRating(): number {
-    if (!this.user?.ratings || !this.user?.ratingCount || this.user.ratingCount === 0) {
+    if (!this.user || !this.user.ratings || !this.user.ratingCount || this.user.ratingCount === 0) {
       return 0;
     }
     

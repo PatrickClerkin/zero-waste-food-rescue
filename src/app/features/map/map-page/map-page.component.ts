@@ -3,7 +3,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodListing, FoodCategory } from '../../../core/models/food-listing.model';
 import { FoodListingService } from '../../../core/services/food-listing.service';
@@ -20,7 +20,8 @@ import { FoodCardComponent } from '../../../shared/components/food-card/food-car
     IonicModule, 
     MapViewComponent, 
     CategoryFilterComponent, 
-    FoodCardComponent
+    FoodCardComponent,
+    RouterLink
   ],
   template: `
     <ion-header>
@@ -235,7 +236,7 @@ export class MapPageComponent implements OnInit, OnDestroy {
     alert.inputs = [
       {
         name: 'distance',
-        type: 'range',
+        type: 'text',
         min: 1,
         max: 50,
         value: this.maxDistance

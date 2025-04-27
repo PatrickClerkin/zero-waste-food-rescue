@@ -4,8 +4,99 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FoodListing } from '../../../core/models/food-listing.model';
 import { environment } from '../../../../environments/environment';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-// Define the Google Maps types we need
+// Create a types.d.ts file in src directory with this content:
+// Type definitions for Google Maps JavaScript API 3.47
+// Project: https://developers.google.com/maps/documentation/javascript/
+declare namespace google.maps {
+  class Map {
+    constructor(mapDiv: Element, opts?: MapOptions);
+    setCenter(latLng: LatLng): void;
+    setZoom(zoom: number): void;
+    fitBounds(bounds: LatLngBounds): void;
+    getZoom(): number;
+  }
+
+  class Marker {
+    constructor(opts?: MarkerOptions);
+    setMap(map: Map | null): void;
+    getPosition(): LatLng;
+    addListener(event: string, handler: Function): void;
+  }
+
+  class LatLng {
+    constructor(lat: number, lng: number);
+    lat(): number;
+    lng(): number;
+  }
+
+  class LatLngBounds {
+    constructor();
+    extend(latLng: LatLng): void;
+  }
+
+  class InfoWindow {
+    constructor(opts?: InfoWindowOptions);
+    open(map: Map, anchor?: MVCObject): void;
+  }
+
+  interface MapOptions {
+    center?: LatLng;
+    zoom?: number;
+    mapTypeId?: string;
+    disableDefaultUI?: boolean;
+    zoomControl?: boolean;
+    mapTypeControl?: boolean;
+    streetViewControl?: boolean;
+    fullscreenControl?: boolean;
+  }
+
+  interface MarkerOptions {
+    position?: LatLng;
+    map?: Map;
+    title?: string;
+    icon?: string | Icon;
+    animation?: Animation;
+  }
+
+  interface Icon {
+    path?: SymbolPath | string;
+    scale?: number;
+    fillColor?: string;
+    fillOpacity?: number;
+    strokeWeight?: number;
+    strokeColor?: string;
+  }
+
+  interface InfoWindowOptions {
+    content?: string;
+  }
+
+  class MVCObject {}
+
+  enum SymbolPath {
+    CIRCLE,
+    FORWARD_CLOSED_ARROW,
+    FORWARD_OPEN_ARROW,
+    BACKWARD_CLOSED_ARROW,
+    BACKWARD_OPEN_ARROW
+  }
+
+  enum Animation {
+    BOUNCE,
+    DROP
+  }
+
+  namespace MapTypeId {
+    export const ROADMAP: string;
+    export const SATELLITE: string;
+    export const HYBRID: string;
+    export const TERRAIN: string;
+  }
+}
+
+// Define Google Maps types
 declare global {
   interface Window {
     initMap: () => void;
@@ -16,6 +107,7 @@ declare global {
   selector: 'app-map-view',
   standalone: true,
   imports: [CommonModule, IonicModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <div class="map-container">
       <div #mapElement id="map"></div>
@@ -81,7 +173,7 @@ export class MapViewComponent implements OnInit, OnChanges, AfterViewInit {
   }
   
   private loadGoogleMapsScript(): void {
-    if (window.google && window.google.maps) {
+    if (typeof google !== 'undefined' && google.maps) {
       this.apiLoaded = true;
       this.initializeMap();
       return;

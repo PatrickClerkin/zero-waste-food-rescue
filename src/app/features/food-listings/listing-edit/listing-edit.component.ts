@@ -6,8 +6,9 @@ import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FoodListingService } from '../../../core/services/food-listing.service';
 import { LocationService } from '../../../core/services/location.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { FoodCategory, FoodListing } from '../../../core/models/food-listing.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-listing-edit',
@@ -368,7 +369,6 @@ export class ListingEditComponent implements OnInit {
     
     this.loadListing();
   }
-  
   async loadListing(): Promise<void> {
     try {
       const listing = await this.foodListingService.getListing(this.listingId);
@@ -380,8 +380,8 @@ export class ListingEditComponent implements OnInit {
       
       this.listing = listing;
       
-      // Check if current user is the owner
-      const currentUser = this.authService.currentUser$.getValue();
+      // Check if current user is the owner - using firstValueFrom instead of getValue()
+      const currentUser = await firstValueFrom(this.authService.currentUser$);
       if (currentUser?.uid !== listing.donorId) {
         // Not the owner, redirect
         this.router.navigate(['/food-listings', this.listingId]);
