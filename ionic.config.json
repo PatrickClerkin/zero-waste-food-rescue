@@ -1,0 +1,7 @@
+{
+  "name": "zero-waste-food-rescue",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
