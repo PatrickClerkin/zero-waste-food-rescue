@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from './core/services/auth.service'; // Fixed import path
 import { NotificationService } from './core/services/notification.service';
 
 @Component({

@@ -23,9 +23,10 @@ import {
   uploadBytesResumable, 
   getDownloadURL 
 } from '@angular/fire/storage';
-import { Observable, from, map, switchMap } from 'rxjs';
+import { Observable, from, map, switchMap, firstValueFrom } from 'rxjs'; // Added firstValueFrom
 import { FoodListing, FoodCategory } from '../models/food-listing.model';
 import { AuthService } from './auth.service';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -40,12 +41,12 @@ export class FoodListingService {
   // Create a new food listing
   async createListing(listing: Omit<FoodListing, 'id' | 'createdAt' | 'updatedAt' | 'donorId' | 'donorName' | 'donorPhoto' | 'status'>, images: File[]): Promise<string> {
     try {
-      const currentUser = await this.authService.currentUser$.pipe(
+      const currentUser = await firstValueFrom(this.authService.currentUser$.pipe(
         map(user => {
           if (!user) throw new Error('User not authenticated');
           return user;
         })
-      ).toPromise();
+      ));
 
       // Upload images first
       const imageUrls = await this.uploadListingImages(images);
@@ -56,9 +57,9 @@ export class FoodListingService {
         images: imageUrls,
         createdAt: new Date(),
         updatedAt: new Date(),
-        donorId: currentUser!.uid,
-        donorName: currentUser!.displayName,
-        donorPhoto: currentUser!.photoURL,
+        donorId: currentUser.uid,
+        donorName: currentUser.displayName,
+        donorPhoto: currentUser.photoURL,
         status: 'available',
       };
       
@@ -244,18 +245,18 @@ export class FoodListingService {
   // Claim a food listing
   async claimListing(listingId: string): Promise<void> {
     try {
-      const currentUser = await this.authService.currentUser$.pipe(
+      const currentUser = await firstValueFrom(this.authService.currentUser$.pipe(
         map(user => {
           if (!user) throw new Error('User not authenticated');
           return user;
         })
-      ).toPromise();
+      ));
       
       const listingRef = doc(this.firestore, 'foodListings', listingId);
       
       await updateDoc(listingRef, {
         status: 'claimed',
-        claimedBy: currentUser!.uid,
+        claimedBy: currentUser.uid,
         claimedAt: new Date()
       });
     } catch (error) {

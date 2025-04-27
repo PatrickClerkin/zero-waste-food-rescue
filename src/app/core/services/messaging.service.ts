@@ -1,3 +1,4 @@
+// src/app/core/services/messaging.service.ts
 import { Injectable, inject } from '@angular/core';
 import { 
   Firestore, 
@@ -9,7 +10,8 @@ import {
   where, 
   orderBy, 
   addDoc,
-  getDocs
+  getDocs,
+  limit as firestoreLimit
 } from '@angular/fire/firestore';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -90,9 +92,11 @@ export class MessagingService {
     return combineLatest([sent$, received$]).pipe(
       map(([sent, received]) => {
         const allMessages = [...sent, ...received];
-        return allMessages.sort((a, b) => 
-          a.createdAt.getTime() - b.createdAt.getTime()
-        );
+        return allMessages.sort((a, b) => {
+          const aTime = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt).getTime();
+          const bTime = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt).getTime();
+          return aTime - bTime;
+        });
       })
     );
   }
@@ -156,7 +160,7 @@ export class MessagingService {
           where('senderId', 'in', [currentUser.uid, userId]),
           where('recipientId', 'in', [currentUser.uid, userId]),
           orderBy('createdAt', 'desc'),
-          limit(1)
+          firestoreLimit(1)
         );
         
         const latestMessageSnapshot = await getDocs(latestMessageQuery);
@@ -189,7 +193,16 @@ export class MessagingService {
     return conversations.sort((a, b) => {
       if (!a.latestMessage) return 1;
       if (!b.latestMessage) return -1;
-      return b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime();
+      
+      const aTime = a.latestMessage.createdAt instanceof Date ? 
+        a.latestMessage.createdAt.getTime() : 
+        new Date(a.latestMessage.createdAt).getTime();
+      
+      const bTime = b.latestMessage.createdAt instanceof Date ? 
+        b.latestMessage.createdAt.getTime() : 
+        new Date(b.latestMessage.createdAt).getTime();
+      
+      return bTime - aTime;
     });
   }
 }

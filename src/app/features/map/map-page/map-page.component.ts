@@ -1,4 +1,5 @@
 // src/app/features/map/map-page/map-page.component.ts
+// Fix the "type" error in the AlertInput component
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';

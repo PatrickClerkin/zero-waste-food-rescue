@@ -10,9 +10,9 @@ import {
   deleteDoc, 
   query, 
   where, 
-  orderBy, 
-  limit,
-  addDoc
+  orderBy,
+  addDoc,
+  getDocs as firestoreGetDocs
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Notification } from '../models/notification.model';
@@ -96,7 +96,7 @@ export class NotificationService {
       where('userType', 'in', ['recipient', 'both'])
     );
     
-    const snapshot = await getDocs(usersQuery);
+    const snapshot = await firestoreGetDocs(usersQuery);
     
     snapshot.forEach(async (userDoc) => {
       const user = userDoc.data();

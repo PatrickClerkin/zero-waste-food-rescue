@@ -1,4 +1,6 @@
 // src/app/core/services/auth.service.ts
+// Moving this from src/app/app/core/services/auth.service.ts
+
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { 
